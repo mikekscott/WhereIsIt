@@ -10,10 +10,17 @@ import UIKit
 
 class WhereListViewController: UITableViewController {
     var WhereItemArray = ["Lawn Mower", "Tile Samples", "Board Games"]
+    //set up a user defaults object
+    let defaults = UserDefaults.standard
     //var alertTextField: UITextField? = nil
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        //recover from defaults
+        if let items = defaults.array(forKey: "WhereItemArray") as? [String] {
+            print(items)
+            WhereItemArray = items
+        }
     }
     //MARK - TableView Data Source Methods
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -47,6 +54,8 @@ class WhereListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             print("Success!")
             self.WhereItemArray.append( alertTextField.text!)
+            //save in defaults
+            self.defaults.set(self.WhereItemArray, forKey: "WhereItemArray")
             //self.messageTableView.reloadData()
             self.tableView.insertRows(at: [IndexPath(row: self.WhereItemArray.count-1, section: 0)], with: .automatic)
             self.view.layoutIfNeeded()

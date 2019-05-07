@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A0FDD05227ED80D006F2EEE /* WhereItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0FDD04227ED80D006F2EEE /* WhereItem.swift */; };
 		0AFA46622271BACE00A0D9CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFA46612271BACE00A0D9CD /* AppDelegate.swift */; };
 		0AFA46642271BACE00A0D9CD /* WhereListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AFA46632271BACE00A0D9CD /* WhereListViewController.swift */; };
 		0AFA46672271BACE00A0D9CD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0AFA46652271BACE00A0D9CD /* Main.storyboard */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A0FDD04227ED80D006F2EEE /* WhereItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhereItem.swift; sourceTree = "<group>"; };
 		0AFA465E2271BACE00A0D9CD /* WhereIsIt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WhereIsIt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0AFA46612271BACE00A0D9CD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0AFA46632271BACE00A0D9CD /* WhereListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhereListViewController.swift; sourceTree = "<group>"; };
@@ -35,6 +37,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A0FDD03227ED7C8006F2EEE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0A0FDD04227ED80D006F2EEE /* WhereItem.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		0AFA46552271BACE00A0D9CD = {
 			isa = PBXGroup;
 			children = (
@@ -54,6 +64,7 @@
 		0AFA46602271BACE00A0D9CD /* WhereIsIt */ = {
 			isa = PBXGroup;
 			children = (
+				0A0FDD03227ED7C8006F2EEE /* Model */,
 				0AFA46612271BACE00A0D9CD /* AppDelegate.swift */,
 				0AFA46632271BACE00A0D9CD /* WhereListViewController.swift */,
 				0AFA46652271BACE00A0D9CD /* Main.storyboard */,
@@ -136,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0AFA46642271BACE00A0D9CD /* WhereListViewController.swift in Sources */,
+				0A0FDD05227ED80D006F2EEE /* WhereItem.swift in Sources */,
 				0AFA46622271BACE00A0D9CD /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -10,8 +10,6 @@ import UIKit
 
 class WhereListViewController: UITableViewController {
     var WhereItemArray = [WhereItem]()
-    var archivedObject = Data() // empty byte buffer
-    //var WhereItemArray = [["Lawn Mower",false], "Tile Samples", "Board Games","a","b","c","d","e","f","g","h","i","k","l","m","n","o"]
     //set up a user defaults object
     let defaults = UserDefaults.standard
     //var alertTextField: UITextField? = nil
@@ -19,24 +17,19 @@ class WhereListViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         //recover from defaults
-        
-        if let unarchivedData = defaults.data(forKey: "WhereItemArray") {
-            let theString:NSString = NSString(data: unarchivedData, encoding: String.Encoding.ascii.rawValue)!
-            
-            print("Unarchive: \(theString)")
-            //print(items)
-            //WhereItemArray = items
-            //NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(unarchivedData) as! [WhereItem]
-            //NSKeyedUnarchiver.unarchivedObject(ofClasses: [WhereItem], from: unarchivedData)
-            do { try WhereItemArray = NSKeyedUnarchiver.unarchivedObject(ofClasses: [WhereItem], from: unarchivedData) as! [WhereItem]
-            } catch let error {
-                print("unarchive error: \(error)")
+        if let items = defaults.array(forKey: "WhereItemArray") as? [String] {
+            print(items)
+            let selected = defaults.array(forKey: "WhereSelectedArray") as! [Bool]
+            for (index, anItem) in items.enumerated(){
+                addItem(item: anItem)
+                WhereItemArray[index].selected = selected[index]
+                
             }
-            //NSKeyedUnarchiver.unarchiveObject(with: unarchivedData) as! [WhereItem]
+            
         } else {
-            addItem(item: "Lawn Mower")
-            addItem(item: "Tile Samples")
-            addItem(item: "Board Games")
+            addItem(item: "Books")
+            addItem(item: "Plates")
+            addItem(item: "Food")
             addItem(item: "a")
             addItem(item: "b")
             addItem(item: "c")
@@ -51,16 +44,12 @@ class WhereListViewController: UITableViewController {
             addItem(item: "l")
             addItem(item: "m")
             addItem(item: "n")
-            addItem(item: "o")
-           
-            
         }
     }
     //MARK - TableView Data Source Methods
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "WhereIsItItem", for: indexPath)
         cell.textLabel?.text = WhereItemArray[indexPath.row].item
-        // get cell.accessoryType from array
         if WhereItemArray[indexPath.row].selected {
             cell.accessoryType = .checkmark
         } else {
@@ -75,13 +64,14 @@ class WhereListViewController: UITableViewController {
     //MARK - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //print(WhereItemArray[indexPath.row])
-        if self.WhereItemArray[indexPath.row].selected {
+        if WhereItemArray[indexPath.row].selected
+        {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
-            self.WhereItemArray[indexPath.row].selected = false
+            WhereItemArray[indexPath.row].selected = false
         } else
         {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-            self.WhereItemArray[indexPath.row].selected = true
+            WhereItemArray[indexPath.row].selected = true
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -90,28 +80,24 @@ class WhereListViewController: UITableViewController {
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var alertTextField = UITextField()
-        
+        var whereItems = [String]()
+        var whereSelected = [Bool]()
         
         
         let alert = UIAlertController(title: "Add New WhereIsIt Item", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             print("Success!")
             self.addItem(item: alertTextField.text!)
-            //save in defaults
-            //let archivedObject = NSKeyedArchiver.archivedData(withRootObject: self.WhereItemArray as NSArray)
-            // Serialise Array
-            do {
-             try self.archivedObject =  NSKeyedArchiver.archivedData(withRootObject: self.WhereItemArray as NSArray, requiringSecureCoding: false)
-            } catch let error {
-                print("unexpected serialise error \(error)")
+            
+            //unpack WhereItemsArray
+            for item in self.WhereItemArray {
+                whereItems.append(item.item)
+                whereSelected.append(item.selected)
             }
-            let theString:NSString = NSString(data: self.archivedObject, encoding: String.Encoding.ascii.rawValue)!
             
-            print("Archive: \(theString)")
-            
-            print("Archive: \(self.archivedObject)")
-            self.defaults.set(self.archivedObject, forKey: "WhereItemArray")
-            //self.defaults.set(self.WhereItemArray, forKey: "WhereItemArray")
+            //save in defaults
+            self.defaults.set(whereItems, forKey: "WhereItemArray")
+            self.defaults.set(whereSelected, forKey: "WhereSelectedArray")
             //self.messageTableView.reloadData()
             self.tableView.insertRows(at: [IndexPath(row: self.WhereItemArray.count-1, section: 0)], with: .automatic)
             self.view.layoutIfNeeded()
@@ -121,22 +107,21 @@ class WhereListViewController: UITableViewController {
             AlertTextField.placeholder = "Add New Item"
             alertTextField = AlertTextField
         }
-            
-            alert.addAction(action)
-            
-            self.present(alert, animated: true, completion: nil)
+        
+        alert.addAction(action)
+        
+        self.present(alert, animated: true, completion: nil)
         //self.present(alert, animated: true) {
-       //     print(self.alertTextField!.text!)
-      //  }
+        //     print(self.alertTextField!.text!)
+        //  }
         
     }
-    
-    // utility function to update WhereItemArray
-    func addItem(item:String){
-        let newItem = WhereItem(item: item, selected: false)
-        WhereItemArray.append(newItem)
+    //utility class: add entry to WhereItemArray
+    func addItem(item:String) {
+        let item = WhereItem(item: item, selected: false)
+        WhereItemArray.append(item)
     }
     
-
+    
 }
 

@@ -9,7 +9,7 @@
 import UIKit
 
 class WhereListViewController: UITableViewController {
-    var WhereItemArray = ["Lawn Mower", "Tile Samples", "Board Games"]
+    var WhereItemArray = [WhereItem]()
     //set up a user defaults object
     let defaults = UserDefaults.standard
     //var alertTextField: UITextField? = nil
@@ -19,13 +19,42 @@ class WhereListViewController: UITableViewController {
         //recover from defaults
         if let items = defaults.array(forKey: "WhereItemArray") as? [String] {
             print(items)
-            WhereItemArray = items
+            let selected = defaults.array(forKey: "WhereSelectedArray") as! [Bool]
+            for (index, anItem) in items.enumerated(){
+                addItem(item: anItem)
+                WhereItemArray[index].selected = selected[index]
+                
+            }
+            
+        } else {
+            addItem(item: "Books")
+            addItem(item: "Plates")
+            addItem(item: "Food")
+            addItem(item: "a")
+            addItem(item: "b")
+            addItem(item: "c")
+            addItem(item: "d")
+            addItem(item: "e")
+            addItem(item: "f")
+            addItem(item: "g")
+            addItem(item: "h")
+            addItem(item: "i")
+            addItem(item: "j")
+            addItem(item: "k")
+            addItem(item: "l")
+            addItem(item: "m")
+            addItem(item: "n")
         }
     }
     //MARK - TableView Data Source Methods
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "WhereIsItItem", for: indexPath)
-        cell.textLabel?.text = WhereItemArray[indexPath.row]
+        cell.textLabel?.text = WhereItemArray[indexPath.row].item
+        if WhereItemArray[indexPath.row].selected {
+            cell.accessoryType = .checkmark
+        } else {
+        cell.accessoryType = .none
+        }
         return cell
     }
     
@@ -35,11 +64,14 @@ class WhereListViewController: UITableViewController {
     //MARK - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //print(WhereItemArray[indexPath.row])
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+        if WhereItemArray[indexPath.row].selected
+     {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        WhereItemArray[indexPath.row].selected = false
         } else
         {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            WhereItemArray[indexPath.row].selected = true
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -48,14 +80,24 @@ class WhereListViewController: UITableViewController {
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var alertTextField = UITextField()
+        var whereItems = [String]()
+        var whereSelected = [Bool]()
         
         
         let alert = UIAlertController(title: "Add New WhereIsIt Item", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             print("Success!")
-            self.WhereItemArray.append( alertTextField.text!)
+            self.addItem(item: alertTextField.text!)
+            
+            //unpack WhereItemsArray
+            for item in self.WhereItemArray {
+                whereItems.append(item.item)
+                whereSelected.append(item.selected)
+            }
+            
             //save in defaults
-            self.defaults.set(self.WhereItemArray, forKey: "WhereItemArray")
+            self.defaults.set(whereItems, forKey: "WhereItemArray")
+            self.defaults.set(whereSelected, forKey: "WhereSelectedArray")
             //self.messageTableView.reloadData()
             self.tableView.insertRows(at: [IndexPath(row: self.WhereItemArray.count-1, section: 0)], with: .automatic)
             self.view.layoutIfNeeded()
@@ -73,6 +115,11 @@ class WhereListViewController: UITableViewController {
        //     print(self.alertTextField!.text!)
       //  }
         
+    }
+    //utility class: add entry to WhereItemArray
+    func addItem(item:String) {
+        let item = WhereItem(item: item, selected: false)
+        WhereItemArray.append(item)
     }
     
 

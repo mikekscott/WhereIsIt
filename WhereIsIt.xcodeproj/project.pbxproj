@@ -45,6 +45,30 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		0A58AD29228445F300EE74A3 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				0AFA46652271BACE00A0D9CD /* Main.storyboard */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		0A58AD2A2284462600EE74A3 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				0AFA46612271BACE00A0D9CD /* AppDelegate.swift */,
+				0AFA46632271BACE00A0D9CD /* WhereListViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		0A58AD2B2284466A00EE74A3 /* Other */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
 		0AFA46552271BACE00A0D9CD = {
 			isa = PBXGroup;
 			children = (
@@ -65,12 +89,12 @@
 			isa = PBXGroup;
 			children = (
 				0A0FDD03227ED7C8006F2EEE /* Model */,
-				0AFA46612271BACE00A0D9CD /* AppDelegate.swift */,
-				0AFA46632271BACE00A0D9CD /* WhereListViewController.swift */,
-				0AFA46652271BACE00A0D9CD /* Main.storyboard */,
+				0A58AD2A2284462600EE74A3 /* Controller */,
+				0A58AD29228445F300EE74A3 /* View */,
 				0AFA46682271BACF00A0D9CD /* Assets.xcassets */,
 				0AFA466A2271BACF00A0D9CD /* LaunchScreen.storyboard */,
 				0AFA466D2271BACF00A0D9CD /* Info.plist */,
+				0A58AD2B2284466A00EE74A3 /* Other */,
 			);
 			path = WhereIsIt;
 			sourceTree = "<group>";

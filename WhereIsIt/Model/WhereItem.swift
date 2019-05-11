@@ -6,7 +6,7 @@
 //  Copyright © 2019 Mike Scott. All rights reserved.
 //
 import Foundation
-class WhereItem {
+class WhereItem : Codable{
 
     var item: String = ""
     var selected: Bool = false

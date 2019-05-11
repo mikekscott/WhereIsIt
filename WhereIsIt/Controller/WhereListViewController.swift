@@ -12,41 +12,19 @@ class WhereListViewController: UITableViewController {
     var WhereItemArray = [WhereItem]()
     //set up a user defaults object
     let defaults = UserDefaults.standard
+     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
+    
     //var alertTextField: UITextField? = nil
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print(dataFilePath!)
         // Do any additional setup after loading the view.
-        //recover from defaults else populate with some initial values
-        //note defaults can't contain objects so convert to ints and bools
-        if let items = defaults.array(forKey: "WhereItemArray") as? [String] {
-            print(items)
-            let selected = defaults.array(forKey: "WhereSelectedArray") as! [Bool]
-            for (index, anItem) in items.enumerated(){
-                addItem(item: anItem)
-                WhereItemArray[index].selected = selected[index]
-                
-            }
-            
-        } else {
-            addItem(item: "Books")
-            addItem(item: "Plates")
-            addItem(item: "Food")
-            addItem(item: "a")
-            addItem(item: "b")
-            addItem(item: "c")
-            addItem(item: "d")
-            addItem(item: "e")
-            addItem(item: "f")
-            addItem(item: "g")
-            addItem(item: "h")
-            addItem(item: "i")
-            addItem(item: "j")
-            addItem(item: "k")
-            addItem(item: "l")
-            addItem(item: "m")
-            addItem(item: "n")
-        }
+        //recover from personal defaults
+        
+        readPlist()
     }
+
     //MARK - TableView Data Source Methods
     //populate rows from model
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -73,6 +51,8 @@ class WhereListViewController: UITableViewController {
         tableView.cellForRow(at: indexPath)?.accessoryType = rowItem.selected ? .checkmark : .none
         //fades out selection
         tableView.deselectRow(at: indexPath, animated: true)
+        //save model
+        writePlist()
     }
     
     //MARK - Outlet Action for add bar button
@@ -82,6 +62,7 @@ class WhereListViewController: UITableViewController {
         var alertTextField = UITextField()
         var whereItems = [String]()
         var whereSelected = [Bool]()
+        
         
         //alert
         let alert = UIAlertController(title: "Add New WhereIsIt Item", message: "", preferredStyle: .alert)
@@ -98,6 +79,7 @@ class WhereListViewController: UITableViewController {
             }
             
             //save in defaults
+            self.writePlist()
             self.defaults.set(whereItems, forKey: "WhereItemArray")
             self.defaults.set(whereSelected, forKey: "WhereSelectedArray")
             //self.messageTableView.reloadData()
@@ -120,12 +102,38 @@ class WhereListViewController: UITableViewController {
         //  }
         
     }
-    //utility class: add entry to WhereItemArray
+    //utility method: add entry to WhereItem model
     func addItem(item:String) {
         let item = WhereItem(item: item, selected: false)
         WhereItemArray.append(item)
     }
     
+    //utility method: write WhereItem model to plist
+    func writePlist() {
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(WhereItemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding Array \(error)")
+        }
+    }
+    //utility method: read WhereItem model from plist
+    func readPlist(){
+        let decoder = PropertyListDecoder()
+        
+        if let data = try? Data(contentsOf: dataFilePath!){
+        do {
+            // [WhereItem].self defines the type
+            WhereItemArray = try decoder.decode([WhereItem].self, from: data)
+        } catch {
+            print("Error decoding Plist \(error)")
+        }
+        }
+        
+    
+        
+    }
     
 }
 

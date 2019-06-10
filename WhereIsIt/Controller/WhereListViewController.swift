@@ -7,22 +7,30 @@
 //
 
 import UIKit
+import CoreData
 
 class WhereListViewController: UITableViewController {
-    var WhereItemArray = [WhereItem]()
-    //set up a user defaults object
-    let defaults = UserDefaults.standard
-     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
+    //array holds DataModel Entities - we called it Item
+    var WhereItemArray = [Item]()
+    //can reference appdelegate instance using a singleton supplied when application runs
+    // the context is the key item you interact with for a datastore and is described as a scratch pad
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+
+    @IBOutlet weak var searchBar: UISearchBar!
     
     //var alertTextField: UITextField? = nil
     override func viewDidLoad() {
         super.viewDidLoad()
+        searchBar.delegate = self
         
-        print(dataFilePath!)
+        // print documents data file path
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        
+       
         // Do any additional setup after loading the view.
         //recover from personal defaults
         
-        readPlist()
+        readItems()
     }
 
     //MARK - TableView Data Source Methods
@@ -46,13 +54,17 @@ class WhereListViewController: UITableViewController {
     //Called when row selected
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let rowItem = WhereItemArray[indexPath.row]
-        rowItem.selected = !rowItem.selected //toggle boolean
-        //Populate accessory type
-        tableView.cellForRow(at: indexPath)?.accessoryType = rowItem.selected ? .checkmark : .none
-        //fades out selection
-        tableView.deselectRow(at: indexPath, animated: true)
-        //save model
-        writePlist()
+//        rowItem.selected = !rowItem.selected //toggle boolean
+//        //Populate accessory type
+//        tableView.cellForRow(at: indexPath)?.accessoryType = rowItem.selected ? .checkmark : .none
+//        //fades out selection
+//        tableView.deselectRow(at: indexPath, animated: true)
+//        //save model
+        // select and delete
+        context.delete(rowItem)
+        WhereItemArray.remove(at: indexPath.row)
+        tableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .automatic)
+        saveItems()
     }
     
     //MARK - Outlet Action for add bar button
@@ -60,8 +72,8 @@ class WhereListViewController: UITableViewController {
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var alertTextField = UITextField()
-        var whereItems = [String]()
-        var whereSelected = [Bool]()
+        //var whereItems = [String]()
+        //var whereSelected = [Bool]()
         
         
         //alert
@@ -70,18 +82,11 @@ class WhereListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             print("Success!")
             //add new item to array
-            self.addItem(item: alertTextField.text!)
+            self.addItem(itemText: alertTextField.text!)
             
-            //unpack WhereItemsArray
-            for item in self.WhereItemArray {
-                whereItems.append(item.item)
-                whereSelected.append(item.selected)
-            }
-            
+         
             //save in defaults
-            self.writePlist()
-            self.defaults.set(whereItems, forKey: "WhereItemArray")
-            self.defaults.set(whereSelected, forKey: "WhereSelectedArray")
+            self.saveItems()
             //self.messageTableView.reloadData()
             // no need to reload whole table if insertRows used
             self.tableView.insertRows(at: [IndexPath(row: self.WhereItemArray.count-1, section: 0)], with: .automatic)
@@ -103,36 +108,81 @@ class WhereListViewController: UITableViewController {
         
     }
     //utility method: add entry to WhereItem model
-    func addItem(item:String) {
-        let item = WhereItem(item: item, selected: false)
+    func addItem(itemText:String) {
+
+        // context initialised at start of class
+
+        let item = Item(context: context)
+        item.item = itemText
+        item.selected = false
+        
+        
+      //  let item = WhereItem(item: item, selected: false)
         WhereItemArray.append(item)
     }
     
     //utility method: write WhereItem model to plist
-    func writePlist() {
-        let encoder = PropertyListEncoder()
+    func saveItems() {
+        
         do {
-            let data = try encoder.encode(WhereItemArray)
-            try data.write(to: dataFilePath!)
+            try context.save()
         } catch {
-            print("Error encoding Array \(error)")
+            print("Error saving context \(error)")
         }
     }
     //utility method: read WhereItem model from plist
-    func readPlist(){
-        let decoder = PropertyListDecoder()
+    //note default parameter is Item.fetchRequest()
+    // All items
+    func readItems(with request: NSFetchRequest<Item> = Item.fetchRequest()){
         
-        if let data = try? Data(contentsOf: dataFilePath!){
         do {
-            // [WhereItem].self defines the type
-            WhereItemArray = try decoder.decode([WhereItem].self, from: data)
+            WhereItemArray = try context.fetch(request)
         } catch {
-            print("Error decoding Plist \(error)")
+            print("error fetching Items \(error)")
         }
+
         }
-        
+//
+//
+//
+//    }
+
+}
+//MARK: searchBarDelegate
+extension WhereListViewController: UISearchBarDelegate {
     
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        //create CoreData fetch request
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
         
+        //create a search predicate
+        if searchBar.text != "" {
+            
+        
+        request.predicate = NSPredicate(format: "item CONTAINS[cd] %@", searchBar.text!)
+        }
+        
+        //create a sort descriptor
+        request.sortDescriptors = [NSSortDescriptor(key: "item", ascending: true)]
+       
+        readItems(with: request)
+        tableView.reloadData()
+        print(searchBar.text ?? "EMPTY")
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // zero text indicates search cancelled
+        if searchText.count == 0 {
+            readItems()
+            tableView.reloadData()
+            //tells searchbar to relinquish focus
+            //this request has to be dispatched to main
+            // thread
+            DispatchQueue.main.async {
+            searchBar.resignFirstResponder()
+            }
+            
+        }
     }
     
 }
